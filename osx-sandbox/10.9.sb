@@ -1,0 +1,123 @@
+(version 1)
+
+(deny default)
+
+(allow file-ioctl
+       (literal "/dev/dtracehelper"))
+
+(allow file-read*
+       (subpath "/Library/Fonts")
+       (literal "/Library/Internet Plug-Ins")
+       (subpath "/Library/Internet Plug-Ins/Flash Player.plugin")
+       (literal "/Library/Preferences/com.apple.HIToolbox.plist")
+       (subpath "%%TBB_ROOT%%")
+       (literal "%%HOMEDIR%%/Library/Input Methods")
+       (literal "%%HOMEDIR%%/Library/Internet Plug-Ins")
+       (literal "%%HOMEDIR%%/Library/Keyboard Layouts")
+       (literal "%%HOMEDIR%%/Library/Saved Application State/org.mozilla.torbrowser.savedState/data.data")
+       (literal "%%HOMEDIR%%/Library/Saved Application State/org.mozilla.torbrowser.savedState/windows.plist")
+       (literal "/dev/dtracehelper")
+       (literal "/dev/random")
+       (literal "/dev/urandom")
+       (literal "/private/etc/passwd")
+       (literal "/private/tmp")
+       (literal "/private/var/tmp")
+       (literal "/usr/local/lib")
+       (subpath "/System")
+       (subpath "/usr/lib")
+       (subpath "/usr/share"))
+
+(allow file-read-metadata
+       (literal "/")
+       (literal "/Library")
+       (literal "%%HOMEDIR%%/Library")
+       (literal "%%HOMEDIR%%/Library/Autosave Information")
+       (literal "%%HOMEDIR%%/Library/Saved Application State")
+       (literal "/etc")
+       (literal "/private/etc/localtime")
+       (literal "/private/var/db/.AppleSetupDone")
+       (literal "/private/var/folders/f7/27l6xbks2yx_qml_r37vqzbr0000gn")
+       (literal "/tmp")
+       (literal "/var"))
+
+(allow file-write*
+       (subpath "%%TBB_ROOT%%/Data/Browser/Caches/profile.default")
+       (subpath "%%TBB_ROOT%%/Data/Browser/profile.default")
+       (subpath "%%TBB_ROOT%%/Data/Tor"))
+
+(allow file-write-data
+       (literal "/dev/dtracehelper"))
+
+
+(allow ipc-posix-shm-read-data
+       (ipc-posix-name "/tmp/com.apple.csseed.26")
+       (ipc-posix-name "CFPBS:92:")
+       (ipc-posix-name "apple.shm.cfprefsd.501")
+       (ipc-posix-name "apple.shm.cfprefsd.daemon")
+       (ipc-posix-name "apple.shm.notification_center"))
+
+(allow ipc-posix-shm-write-data
+       (ipc-posix-name "CFPBS:92:"))
+
+(allow mach-lookup
+       (global-name "com.apple.CoreServices.coreservicesd")
+       (global-name "com.apple.FontObjectsServer")
+       (global-name "com.apple.FontServer")
+       (global-name "com.apple.xpcd")
+       (global-name "com.apple.ProgressReporting")
+       (global-name "com.apple.SystemConfiguration.SCNetworkReachability")
+       (global-name "com.apple.cfprefsd.agent")
+       (global-name "com.apple.cfprefsd.daemon")
+       (global-name "com.apple.coreservices.appleevents")
+       (global-name "com.apple.coreservices.launchservicesd")
+       (global-name "com.apple.cvmsServ")
+       (global-name "com.apple.distributed_notifications@Uv3")
+       (global-name "com.apple.dock.server")
+       (global-name "com.apple.pasteboard.1")
+       (global-name "com.apple.pbs.fetch_services")
+       (global-name "com.apple.system.logger")
+       (global-name "com.apple.system.notification_center")
+       (global-name "com.apple.system.opendirectoryd.libinfo")
+       (global-name "com.apple.system.opendirectoryd.membership")
+       (global-name "com.apple.tsm.uiserver")
+       (global-name "com.apple.window_proxies")
+       (global-name "com.apple.windowserver.active"))
+
+(allow iokit-open
+       (iokit-user-client-class "AGPMClient")
+       (iokit-user-client-class "AppleGraphicsControlClient")
+       (iokit-user-client-class "IGAccelDevice")
+       (iokit-user-client-class "IGAccelGLContext")
+       (iokit-user-client-class "IGAccelSharedUserClient")
+       (iokit-user-client-class "IOFramebufferSharedUserClient")
+       (iokit-user-client-class "IOHIDParamUserClient")
+       (iokit-user-client-class "RootDomainUserClient")
+       (iokit-user-client-class "nvDevice")
+       (iokit-user-client-class "nvFermiGLContext")
+       (iokit-user-client-class "nvSharedUserClient"))
+
+(allow mach-register
+       (local-name "com.apple.CFPasteboardClient")
+       (local-name "com.apple.axserver")
+       (local-name "com.apple.coredrag")
+       (local-name "com.apple.tsm.portname"))
+
+(allow network-inbound
+       (local tcp "localhost:9150")
+       (local tcp "localhost:9151"))
+
+(allow network-outbound)
+;currently everything runs in a huge sandbox. we would prefer to run it in separate ones.
+;       (remote tcp "*:443")
+;       (remote tcp "*:80")
+;       (remote tcp "*:9001")
+;       (remote tcp "localhost:9150")
+;       (remote tcp "localhost:9151"))
+
+(allow process-exec
+       (literal "%%TBB_ROOT%%/Contents/MacOS/TorBrowser.app/Contents/MacOS/firefox")
+       (literal "%%TBB_ROOT%%/Tor/tor"))
+
+(allow process-fork)
+
+(allow sysctl-read)

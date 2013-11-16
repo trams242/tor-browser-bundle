@@ -13,6 +13,10 @@
 # Copyright 2010 The Tor Project.  See LICENSE for licensing information.
 
 DEBUG_TBB=0
+#set this to 1 to enable sandboxing.
+SANDBOX_ENABLE=1
+HOMEDIR=$HOME
+export HOMEDIR
 
 if [ "x$1" = "x--debug" -o "x$1" = "x-debug" ]; then
 	DEBUG_TBB=1
@@ -53,9 +57,44 @@ if [ "$DEBUG_TBB" -eq 1 ]; then
 	printf "\nStarting Tor Browser now\n"
 	cd "${HOME}"
 	printf "\nLaunching Tor Browser from: `pwd`\n"
-    ./Contents/MacOS/TorBrowser.app/Contents/MacOS/firefox -jsconsole -no-remote -profile "${HOME}/Data/Browser/profile.default"
+    ./Contents/MacOS/TorBrowser.app/Contents/MacOS/firefox-bin -jsconsole -no-remote -profile "${HOME}/Data/Browser/profile.default"
 	printf "\nTor Browser exited with the following return code: $?\n"
 	exit
+fi
+
+if [ "$SANDBOX_ENABLE" -eq 1 ]; then
+	OSXVER=`/usr/bin/sw_vers -productVersion`
+	if [ "$OSXVER" == "10.9" ]; then
+		printf "\nStarting tbb in sandbox.\n"
+		cd "${HOME}"
+		HOME=`echo $HOME | sed 's=/$==g'`
+		# clean up the sandbox
+		mkdir ${HOME}/osx-sandbox/tmpdata
+		/usr/bin/sed -e "s=%%TBB_ROOT%%=${HOME}=g" -e "s=%%HOMEDIR%%=$HOMEDIR=g" "${HOME}/osx-sandbox/10.9.sb" > "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+		# ensure user can read and write to downloads
+		echo "(allow file-read* file-write*" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+		echo "(subpath \"${HOMEDIR}/Downloads\"))" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+		# ensure that sandbox will allow traversing to the downloads area,
+		# else tbb will have trouble with open file diag.
+		echo "(allow file-read*" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+		echo "(literal \"$HOMEDIR\")" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+		while [ "$HOMEDIR" != "/" ]; do
+			HOMEDIR=`echo $HOMEDIR | sed 's=\(/.*\)/\(.*\)$=\1=g'`
+			echo "(literal \"$HOMEDIR\")" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+			if [ "`echo $HOMEDIR| sed 's=[^/]==g'`" == "/" ]; then
+				HOMEDIR=/
+				echo "(literal \"$HOMEDIR\"))" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+			fi
+		done
+		/usr/bin/sandbox-exec -f "${HOME}/osx-sandbox/tmpdata/10.9.sb" "${HOME}/Contents/MacOS/TorBrowser.app/Contents/MacOS/firefox"
+		exit
+	else
+		exit
+		echo "Sandboxing for $OSXVER not supported atm. starting without."
+		cd "${HOME}"
+		open "${HOME}/Contents/MacOS/TorBrowser.app" --args -no-remote -profile "${HOME}/Data/Browser/profile.default"
+		exit
+	fi
 fi
 
 # not in debug mode, run proceed normally
