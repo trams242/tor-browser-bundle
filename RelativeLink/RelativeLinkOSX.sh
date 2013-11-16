@@ -64,13 +64,15 @@ fi
 
 if [ "$SANDBOX_ENABLE" -eq 1 ]; then
 	OSXVER=`/usr/bin/sw_vers -productVersion`
+	MYUID=`/usr/bin/id -u`
 	if [ "$OSXVER" == "10.9" ]; then
 		printf "\nStarting tbb in sandbox.\n"
 		cd "${HOME}"
 		HOME=`echo $HOME | sed 's=/$==g'`
+		MYTMP=`echo $TMPDIR | sed 's=/$==g'`
 		# clean up the sandbox
 		mkdir ${HOME}/osx-sandbox/tmpdata
-		/usr/bin/sed -e "s=%%TBB_ROOT%%=${HOME}=g" -e "s=%%HOMEDIR%%=$HOMEDIR=g" "${HOME}/osx-sandbox/10.9.sb" > "${HOME}/osx-sandbox/tmpdata/10.9.sb"
+		/usr/bin/sed -e "s=%%TBB_ROOT%%=${HOME}=g" -e "s=%%TMPDIR%%=$MYTMP=g" -e "s=%%UID%%=$MYUID=g" -e "s=%%HOMEDIR%%=$HOMEDIR=g" "${HOME}/osx-sandbox/10.9.sb" > "${HOME}/osx-sandbox/tmpdata/10.9.sb"
 		# ensure user can read and write to downloads
 		echo "(allow file-read* file-write*" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
 		echo "(subpath \"${HOMEDIR}/Downloads\"))" >> "${HOME}/osx-sandbox/tmpdata/10.9.sb"
