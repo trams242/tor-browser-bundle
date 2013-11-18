@@ -29,7 +29,7 @@
 ;; Written by andreas@romab.com
 (version 1)
 
-(deny default(with no-log))
+(deny default)
 
 (allow file-ioctl
        (literal "/dev/dtracehelper"))
